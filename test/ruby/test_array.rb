@@ -2846,6 +2846,13 @@ class TestArray < Test::Unit::TestCase
     EOS
   end
 
+  def test_median
+    assert_equal(nil, [].median)
+    assert_int_equal(1, [1].median)
+    assert_float_equal(1.5, [1, 2].median)
+    assert_int_equal(2, [1, 3, 2].median)
+  end
+
   private
   def need_continuation
     unless respond_to?(:callcc, true)

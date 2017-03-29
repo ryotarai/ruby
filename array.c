@@ -5894,6 +5894,36 @@ rb_ary_sum(int argc, VALUE *argv, VALUE ary)
 }
 
 /*
+ * call-seq:
+ *   ary.median  -> number
+ *
+ * Returns the median of elements.
+ *
+ * If the array has even number of elements,
+ * this returns the mean of the two middle elements.
+ *
+ * [1, 3, 2].median    #=> 2
+ * [1, 3, 2, 4].median #=> 2.5
+ */
+static VALUE
+rb_ary_median(VALUE ary)
+{
+    long length = RARRAY_LEN(ary);
+    if (length == 0) {
+        return Qnil;
+    }
+
+    VALUE sorted = rb_ary_sort(ary);
+    if (length % 2 == 1) {
+        return rb_ary_entry(sorted, length / 2);
+    }
+
+    VALUE sum = rb_funcall(rb_ary_entry(sorted, length / 2 - 1), rb_intern("+"), 1, rb_ary_entry(sorted, length / 2));
+    VALUE avg = rb_funcall(sum, rb_intern("/"), 1, DBL2NUM(2.0));
+    return avg;
+}
+
+/*
  *  Arrays are ordered, integer-indexed collections of any object.
  *
  *  Array indexing starts at 0, as in C or Java.  A negative index is assumed
@@ -6250,6 +6280,7 @@ Init_Array(void)
     rb_define_method(rb_cArray, "any?", rb_ary_any_p, 0);
     rb_define_method(rb_cArray, "dig", rb_ary_dig, -1);
     rb_define_method(rb_cArray, "sum", rb_ary_sum, -1);
+    rb_define_method(rb_cArray, "median", rb_ary_median, 0);
 
     id_cmp = rb_intern("<=>");
     id_random = rb_intern("random");
